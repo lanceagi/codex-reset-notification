@@ -1,0 +1,32 @@
+name: 义父情报卡定时推送
+
+# 免服务器部署：fork 本仓库 → Settings → Secrets → Actions 添加
+#   FEISHU_WEBHOOK_URL（必填，飞书自定义机器人 Webhook）
+#   FEISHU_WEBHOOK_SECRET（选填，机器人开启"签名校验"时）
+# 然后 Enable workflow 即可。首次可手动 Run workflow 验证。
+# 注意：仓库 60 天无提交时 GitHub 会自动暂停定时任务，到 Actions 页重新 Enable 即可。
+
+on:
+  schedule:
+    # UTC；对应北京时间 05/08/10/12/17 点的 :07（分钟位错开整点，防飞书限流）
+    - cron: "7 21,0,2,4,9 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: 推送义父情报卡
+        env:
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          FEISHU_WEBHOOK_SECRET: ${{ secrets.FEISHU_WEBHOOK_SECRET }}
+        run: |
+          if [ -z "${FEISHU_WEBHOOK_URL:-}" ]; then
+            echo "未配置 FEISHU_WEBHOOK_URL secret，跳过推送。配置方法见 README「免服务器部署」。"
+            exit 0
+          fi
+          python3 scripts/push_reset.py

@@ -1,0 +1,15 @@
+# aihot 条款：数据快照禁止入库
+codex-resets-raw-*.json
+codex-resets.json
+events-detail.json
+
+# 运行状态与产物
+.push_state.json
+*.log
+__pycache__/
+*.pyc
+.DS_Store
+
+# 本机工具产物（不入库）
+.mimosa/
+task-contract-gate/
